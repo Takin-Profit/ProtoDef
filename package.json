@@ -27,9 +27,12 @@
     "prepack": "pinst --disable",
     "postpack": "pinst --enable",
     "prepare": "husky install",
-    "test": "tsx bin/test.ts"
+    "test": "tsx bin/test.ts",
+    "run_script": "tsx src/main.ts"
   },
-  "dependencies": {},
+  "dependencies": {
+    "avsc": "^5.7.7"
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.6.6",
     "@commitlint/config-conventional": "^17.6.6",

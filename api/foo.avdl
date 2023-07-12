@@ -1,0 +1,8 @@
+protocol Fame {
+  record Job {
+  string jobid;
+  date submitDate;
+  time_ms submitTime;
+  timestamp_ms finishTime;
+}
+}

@@ -1,8 +1,17 @@
 {
   "compilerOptions": {
-    "types": ["@types/node"],
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "types": [
+      "@types/node"
+    ],
     "noEmit": true,
     "allowJs": true
   },
-  "include": [".eslintrc.cjs"]
+  "include": [
+    ".eslintrc.cjs"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
