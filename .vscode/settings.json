@@ -1,0 +1,25 @@
+{
+    "cSpell.words": [
+        "atrsl",
+        "Bbwp",
+        "eurusd",
+        "immer",
+        "linreg",
+        "LSMA",
+        "ohlc",
+        "signia",
+        "SMMA",
+        "sonarjs",
+        "Swma",
+        "TEMA"
+    ],
+    "conventionalCommits.scopes": [
+        "api",
+        "lib",
+        "indicators",
+        "sma",
+        "test"
+    ],
+    "docwriter.style": "JSDoc",
+    "docwriter.progress.trackTypes": false
+}
