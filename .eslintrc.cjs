@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/no-commonjs
+// eslint-disable-next-line import/no-commonjs, unicorn/no-empty-file
 module.exports = {
   env: {
     es2022: true,
@@ -61,9 +61,17 @@ module.exports = {
     'unicorn/filename-case': 0
   },
   settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx']
+    },
+    'import/extensions': ['.js', '.jsx', '.ts', '.tsx', '.d.ts', 'json'],
     'import/resolver': {
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx', '.d.ts', 'json']
+      },
+      typescript: {
+        alwaysTryTypes: true,
+        project: './tsconfig.json'
       }
     }
   }

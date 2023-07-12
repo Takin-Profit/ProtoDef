@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "pretty": true,
     "noEmitOnError": true,
     "target": "ESNext",
     "lib": [
       "ESNext"
     ],
-    "module": "ES2022",
+    "module": "es2020",
     "rootDir": "./",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Node",
     "allowJs": true,
     "checkJs": true,
     "declaration": true,

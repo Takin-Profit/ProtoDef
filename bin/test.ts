@@ -1,9 +1,9 @@
-import { expect } from '@japa/expect'
-import { pathToFileURL } from 'node:url'
 import { apiClient } from '@japa/api-client'
-import { specReporter } from '@japa/spec-reporter'
+import { expect } from '@japa/expect'
 import { runFailedTests } from '@japa/run-failed-tests'
 import { configure, processCliArgs, run } from '@japa/runner'
+import { specReporter } from '@japa/spec-reporter'
+import { pathToFileURL } from 'node:url'
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +22,7 @@ configure({
   ...processCliArgs(process.argv.slice(2)),
   // eslint-disable-next-line unicorn/no-useless-spread
   ...{
-    files: ['tests/**/*.spec.ts'],
+    files: ['tests/**/*.test.ts'],
     plugins: [expect(), runFailedTests(), apiClient('http://localhost:3333')],
     reporters: [specReporter()],
     importer: filePath => import(pathToFileURL(filePath).href)
