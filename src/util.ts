@@ -13,7 +13,13 @@ const protocol = 'protocol'
 
 // convert CamelCase to snake_case
 export const camelToSnake = (str: string) => {
-  return str.replaceAll(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+  if (!str) {
+    return str
+  }
+  return (
+    str[0].toLowerCase() +
+    str.slice(1).replaceAll(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+  )
 }
 
 export const protoName = (schema: Record<string, unknown>): string =>

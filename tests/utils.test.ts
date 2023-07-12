@@ -2,10 +2,10 @@
 // Copyright 2023 Takin Profit. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-import test, { group } from 'japa'
+import test from 'japa'
 import { camelToSnake } from '../src/index.js'
 
-group('Test camelToSnake', () => {
+test.group('Test camelToSnake', () => {
   test('should convert camelCase to snake_case', assert => {
     const input = 'thisIsATest'
     const expected = 'this_is_a_test'
