@@ -1,6 +1,6 @@
 # EasyRpc
 
-what is (purposely) not supported
+(intetionally)  unsupported avro idl language syntax.
 
 * @namespace
 * @aliase
@@ -10,3 +10,4 @@ what is (purposely) not supported
 * null union shorthand, E.G.  `string?`
 * throws,  use `union { SomeType, SomeError } ` instead
 * oneway
+* @logicalType

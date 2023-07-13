@@ -21,7 +21,7 @@ protocol Simple {
 
     Kind kind;
 
-    /*
+    /** A nullable field.
     Note that 'null' is the first union type. Just like .avsc / .avpr files, the default value must be of the first union type.
     */
     union {null, string} nullableHash = null;

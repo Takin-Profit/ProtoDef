@@ -7,6 +7,7 @@
 import asvc from 'avsc'
 import path from 'node:path'
 import url from 'node:url'
+import { parseRecords } from './parser/record.js'
 
 const makePath = (file: string) =>
   path.join(
@@ -22,7 +23,8 @@ const makePath = (file: string) =>
 */
 
 asvc.assembleProtocol(makePath('pt.avdl'), (err, schema) => {
-  console.log(schema)
+  const data = schema as Record<string, unknown>
+  parseRecords(data)
 
   console.error(err)
 })

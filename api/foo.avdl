@@ -4,5 +4,9 @@ protocol Fame {
   date submitDate;
   time_ms submitTime;
   timestamp_ms finishTime;
+  map<string> params;
+  map<array<string>> env;
+  array<array<map<array<string>>>> inputFiles;
+  union { string, array<string>, map<array<string>>, union {string, int} } outputFiles;
 }
 }
