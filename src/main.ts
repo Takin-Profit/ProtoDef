@@ -7,6 +7,7 @@
 import asvc from 'avsc'
 import path from 'node:path'
 import url from 'node:url'
+import { build } from './build.js'
 
 const makePath = (file: string) =>
   path.join(
@@ -22,8 +23,6 @@ const makePath = (file: string) =>
 */
 
 asvc.assembleProtocol(makePath('pt.avdl'), (err, schema) => {
-  const data = schema as Record<string, unknown>
-  console.log(data)
-
+  console.log(build(schema))
   console.error(err)
 })

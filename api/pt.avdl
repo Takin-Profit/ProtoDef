@@ -41,10 +41,11 @@ protocol Simple {
   string hello(string greeting);
   /** Return what was given. Demonstrates the use of backticks to name types/fields/messages/parameters after keywords */
   TestRecord echo(TestRecord `record`);
+
   /** |GET| Add two numbers */
   int add(int arg1, int arg2);
   bytes echoBytes(bytes data);
   union {string, TestError} `error`();
   // The oneway keyword forces the method to return null.
-  void ping() oneway;
+  void ping();
 }

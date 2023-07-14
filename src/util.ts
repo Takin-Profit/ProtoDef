@@ -3,13 +3,55 @@
 // license that can be found in the LICENSE file.
 
 export type Lang = 'ts' | 'py'
-export const hasDoc = (schema: object) =>
-  Object.prototype.hasOwnProperty.call(schema, 'doc')
-
-export const hasNameSpace = (schema: object) =>
-  Object.prototype.hasOwnProperty.call(schema, 'namespace')
+// grab the protocol doc comment
+export const getDoc = (obj: Record<string, unknown>): string | undefined => {
+  if (obj['doc'] === undefined || obj['doc'] === null) {
+    return undefined
+  }
+  return obj['doc'] as string
+}
 
 const protocol = 'protocol'
+// grab the protocol name
+export const getProtoName = (schema: Record<string, unknown>): string =>
+  schema[protocol] as string
+
+export const getTypes = (
+  schema: Record<string, unknown>
+): Record<string, unknown>[] =>
+  'types' in schema ? (schema['types'] as Record<string, unknown>[]) : []
+
+export const getRecords = (
+  schema: Record<string, unknown>
+): Record<string, unknown>[] =>
+  getTypes(schema).filter(t => 'type' in t && t['type'] === 'record')
+
+export const getEnums = (
+  schema: Record<string, unknown>
+): Record<string, unknown>[] =>
+  getTypes(schema).filter(t => 'type' in t && t['type'] === 'enum')
+
+export const getErrors = (
+  schema: Record<string, unknown>
+): Record<string, unknown>[] =>
+  getTypes(schema).filter(t => 'type' in t && t['type'] === 'error')
+
+export const getMethods = (
+  schema: Record<string, unknown>
+): { name: string; obj: Record<string, unknown> }[] => {
+  const methods =
+    'messages' in schema
+      ? (schema['messages'] as Record<string, unknown>)
+      : { messages: {} }
+
+  const defs: { name: string; obj: Record<string, unknown> }[] = []
+  for (const name in methods) {
+    if (Object.hasOwn(methods, name)) {
+      defs.push({ name, obj: methods[name] as Record<string, unknown> })
+    }
+  }
+  return defs
+}
 
 // convert CamelCase to snake_case
 export const camelToSnake = (str: string) => {
@@ -22,9 +64,6 @@ export const camelToSnake = (str: string) => {
   )
 }
 
-export const protoName = (schema: Record<string, unknown>): string =>
-  schema[protocol] as string
-
 export const makeFileName = (
   schema: Record<string, unknown>,
   lang: Lang = 'ts',
@@ -32,5 +71,5 @@ export const makeFileName = (
     fileName
 ) =>
   lang === 'ts' || lang === 'py'
-    ? `${camelToSnake(protoName(schema))}.py`
-    : fileNameMaker(lang, protoName(schema))
+    ? `${camelToSnake(getProtoName(schema))}.py`
+    : fileNameMaker(lang, getProtoName(schema))

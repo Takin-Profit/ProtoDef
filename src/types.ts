@@ -2,10 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/** Http Verbs that are accepted in doc comments to produce the proper
- * code output for clients and servers */
-export type HttpVerb = 'GET' | 'POST' | 'PUT' | 'DELETE'
-
 /** represents the name of a type defined in the Protocol, Either a record or an Enum */
 export type TypeName = { name: string } & { __brand: 'TypeName' }
 
@@ -55,17 +51,39 @@ export type FieldDef = {
   doc?: string
 } & { __brand: 'FieldDef' }
 
-/** represents an Avro Record Definition */
-type RecordDef = {
+type Common = {
   name: string
   doc?: string
   fields: FieldDef[]
-} & { __brand: 'RecordDef' }
+}
+/** represents an Avro Record Definition */
+export type RecordDef = Common & { __brand: 'RecordDef' }
 
 /** represents an Avro Error Definition */
-export type ErrorDef = RecordDef & { __brand: 'ErrorDef' }
+export type ErrorDef = Common & { __brand: 'ErrorDef' }
+
+/** represents an Avro Message Param Definition */
+export type ParamDef = {
+  name: string
+  type: FieldType
+} & { __brand: 'ParamDef' }
+
+/** Http Verbs that are accepted in doc comments to produce the proper
+ * code output for clients and servers */
+export type RequestType = 'GET' | 'POST' | 'PUT' | 'DELETE'
+
+export type Void = { type: 'void' } & { __brand: 'Void' }
+
+/** represents an Avro Method Return Type Definition */
+export type ReturnTypeDef = FieldType | Void
 /** represents an Avro Method Definition */
-export type MethodDef = RecordDef & { __brand: 'MethodDef' }
+export type MethodDef = {
+  name: string
+  doc?: string
+  httpRequestType: RequestType
+  returnType: ReturnTypeDef
+  params: ParamDef[]
+} & { __brand: 'MethodDef' }
 
 /** Represents an Avro Protocol Definition */
 export type ProtoDef = {
@@ -75,4 +93,4 @@ export type ProtoDef = {
   enums: EnumDef[]
   errors: ErrorDef[]
   methods: MethodDef[]
-}
+} & { __brand: 'ProtoDef' }

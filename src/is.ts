@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// Cast unknown to a type that can be worked with
 type Field = Record<string, unknown> & { type: unknown }
 
+// convert from unknown to Field
 const getField = (s: unknown): Field => {
   if (typeof s !== 'object' || s === null || !('type' in s)) {
     throw new Error('invalid field')
