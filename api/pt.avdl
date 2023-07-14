@@ -29,6 +29,10 @@ protocol Simple {
     array<long> arrayOfLongs;
   }
 
+  record EmbededRecord {
+    TestRecord record;
+  }
+
   /** Errors are records that can be thrown from a method */
   error TestError {
     string message;

@@ -31,7 +31,8 @@
     "run_script": "tsx src/main.ts"
   },
   "dependencies": {
-    "avsc": "^5.7.7"
+    "avsc": "^5.7.7",
+    "live-plugin-manager": "^0.18.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.6.6",
