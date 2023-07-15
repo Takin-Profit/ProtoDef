@@ -11,7 +11,7 @@ import {
 
 export const build = (data: unknown): ProtoDef => {
   if (typeof data !== 'object' || data === null) {
-    throw new TypeError('data must be an object')
+    throw new TypeError('Invalid Input data must be an object')
   }
 
   return {

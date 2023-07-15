@@ -11,3 +11,4 @@
 * throws,  use `union { SomeType, SomeError } ` instead
 * oneway
 * @logicalType
+* default values , this should be defined in your code, not the api.

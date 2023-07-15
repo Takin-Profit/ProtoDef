@@ -1,7 +1,19 @@
 protocol Fame {
   record Job {
+  string jobid;
+  date submitDate;
+  time_ms submitTime;
+  timestamp_ms finishTime;
+  map<string> params;
+  map<array<string>> env;
   array<array<map<array<string>>>> inputFiles;
   union { string, array<string>, map<array<string>>, union {string, int} } outputFiles;
   array<time_ms> times;
+}
+
+  record Employee {
+  string name;
+  boolean active = true;
+  long salary;
 }
 }

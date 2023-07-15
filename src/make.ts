@@ -1,26 +1,26 @@
-/* eslint-disable unicorn/no-array-callback-reference */
 // Copyright 2023 Takin Profit. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 import { is } from './is.js'
 import {
-  ArrayDef,
   EnumDef,
   ErrorDef,
   FieldDef,
   FieldType,
-  MapDef,
   MethodDef,
   ParamDef,
   PrimitiveDef,
   RecordDef,
   RequestType,
   ReturnTypeDef,
-  TypeName,
-  UnionDef
+  arrayDef,
+  mapDef,
+  primitiveDef,
+  typeName,
+  unionDef
 } from './types.js'
-import { RawType, getDoc, hasProp } from './util.js'
+import { RawType, fixDoc, getDoc, hasProp } from './util.js'
 
 const parseRequestType = (doc: string): RequestType => {
   const match = new RegExp(/\|\s*(get|post|put|delete)\s*\|/i).exec(doc)
@@ -43,52 +43,23 @@ const validate = (obj: Record<string, unknown>, errMsg: string) => {
   }
 }
 export const make = {
-  primitive(type: string): PrimitiveDef {
-    return { type, __brand: 'PrimitiveDef' } as PrimitiveDef
-  },
-  union(typesList: RawType[]): UnionDef {
-    return {
-      types: typesList.map(t => this.fieldType(t)),
-      __brand: 'UnionDef'
-    }
-  },
-  typeName(name: string): TypeName {
-    return { name, __brand: 'TypeName' }
-  },
-
-  map(type: Record<string, unknown>): MapDef {
-    return {
-      values: this.fieldType(type['values'] as RawType),
-      __brand: 'MapDef'
-    }
-  },
-  array(it: Record<string, unknown>): ArrayDef {
-    return {
-      items: this.fieldType(it['items'] as RawType),
-      __brand: 'ArrayDef'
-    }
-  },
-
   logicalPrim(type: Record<string, unknown>): PrimitiveDef {
     if (!is.logicalType(type)) {
       throw new Error(`invalid logical type => ${JSON.stringify(type)}`)
     }
-    return {
-      type: type['logicalType'] as string,
-      __brand: 'PrimitiveDef'
-    } as PrimitiveDef
+    return primitiveDef(type['logicalType'] as string)
   },
 
   _handleString(type: string) {
-    return is.primitive(type) ? make.primitive(type) : make.typeName(type)
+    return is.primitive(type) ? primitiveDef(type) : typeName(type)
   },
 
   _handleObj(type: Record<string, unknown>) {
     if (hasProp(type, 'items')) {
-      return make.array(type)
+      return arrayDef(make.fieldType(type['items'] as RawType))
     }
     if (hasProp(type, 'values')) {
-      return make.map(type)
+      return mapDef(make.fieldType(type['values'] as RawType))
     }
     if (hasProp(type, 'logicalType')) {
       return make.logicalPrim(type)
@@ -104,7 +75,8 @@ export const make = {
     }
 
     if (Array.isArray(type)) {
-      return make.union(type as RawType[])
+      const typesList = type as RawType[]
+      return unionDef(typesList.map(t => make.fieldType(t)))
     }
 
     if (typeof type === 'object') {
@@ -120,7 +92,7 @@ export const make = {
     return {
       __brand: 'FieldDef',
       name: obj['name'] as string,
-      type: this.fieldType(obj['type'] as RawType),
+      type: make.fieldType(obj['type'] as RawType),
       doc: getDoc(obj)
     }
   },
@@ -140,7 +112,7 @@ export const make = {
       __brand: 'RecordDef',
       name: obj['name'] as string,
       fields: obj['fields'].map(f =>
-        this.fieldDef(f as Record<string, unknown>)
+        make.fieldDef(f as Record<string, unknown>)
       ),
       doc: getDoc(obj)
     }
@@ -160,7 +132,7 @@ export const make = {
       __brand: 'ErrorDef',
       name: obj['name'] as string,
       fields: obj['fields'].map(f =>
-        this.fieldDef(f as Record<string, unknown>)
+        make.fieldDef(f as Record<string, unknown>)
       ),
       doc: getDoc(obj)
     }
@@ -191,7 +163,7 @@ export const make = {
     return {
       __brand: 'ParamDef',
       name: obj['name'] as string,
-      type: this.fieldType(obj)
+      type: make.fieldType(obj['type'] as RawType)
     }
   },
 
@@ -202,7 +174,7 @@ export const make = {
     if (typeof obj === 'string' && obj === 'null') {
       return { __brand: 'Void', type: 'void' }
     }
-    return this.fieldType(obj as RawType)
+    return make.fieldType(obj as RawType)
   },
 
   method(def: { name: string; obj: Record<string, unknown> }): MethodDef {
@@ -218,13 +190,14 @@ export const make = {
     ) {
       throw new Error(`invalid method definition`)
     }
+    const doc = getDoc(obj)
     return {
       __brand: 'MethodDef',
-      doc: getDoc(obj),
+      doc: fixDoc(doc ?? '').trim(),
       name,
-      httpRequestType: parseRequestType(getDoc(obj) ?? 'GET'),
-      params: obj['request'].map(f => this.param(f as Record<string, unknown>)),
-      returnType: this.returnType(obj['response'] as Record<string, unknown>)
+      httpRequestType: parseRequestType(doc ?? 'GET'),
+      params: obj['request'].map(f => make.param(f as Record<string, unknown>)),
+      returnType: make.returnType(obj['response'] as Record<string, unknown>)
     }
   }
 }

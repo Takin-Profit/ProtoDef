@@ -2,10 +2,16 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// possible types for a field from avro schema
-
+// Remove http types from doc comments.
+export const fixDoc = (doc: string): string => {
+  const wordsToDelete = ['get', 'put', 'post', 'delete']
+  const regex = new RegExp(`\\|(${wordsToDelete.join('|')})\\|`, 'gi')
+  return doc.replaceAll(regex, '')
+}
 export const hasProp = (obj: unknown, prop: string) =>
   Object.prototype.hasOwnProperty.call(obj, prop)
+
+// possible types for a field from avro schema
 export type RawType = string | Record<string, unknown> | Array<unknown>
 export const isObj = (obj: unknown): obj is Record<string, unknown> =>
   typeof obj === 'object' && obj !== null

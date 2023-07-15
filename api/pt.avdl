@@ -42,7 +42,7 @@ protocol Simple {
   /** Return what was given. Demonstrates the use of backticks to name types/fields/messages/parameters after keywords */
   TestRecord echo(TestRecord `record`);
 
-  /** |GET| Add two numbers */
+  /** |DELETE| Add two numbers */
   int add(int arg1, int arg2);
   bytes echoBytes(bytes data);
   union {string, TestError} `error`();

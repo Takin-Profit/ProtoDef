@@ -1,5 +1,5 @@
 {
-  "name": "incremental_indicators",
+  "name": "protodef",
   "version": "1.0.0",
   "description": "Incrementally calculated indicators for nodejs",
   "keywords": [

@@ -9,6 +9,8 @@
         "linreg",
         "LSMA",
         "ohlc",
+        "protodef",
+        "protos",
         "signia",
         "SMMA",
         "sonarjs",
