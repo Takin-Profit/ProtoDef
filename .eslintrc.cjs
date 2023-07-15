@@ -42,6 +42,7 @@ module.exports = {
     'prettier'
   ],
   rules: {
+    'i18n-text/no-en': 0,
     'unicorn/prevent-abbreviations': 0,
     'eslint-comments/no-use': 'off',
     'no-console': 'warn',
