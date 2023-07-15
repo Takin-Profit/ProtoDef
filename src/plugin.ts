@@ -1,106 +1,56 @@
-/** Getters that are common to all Types that are a `FieldType` */
-export type Getters = {
-  isTypeName: boolean
-  isPrimitiveDef: boolean
-  isMapDef: boolean
-  isArrayDef: boolean
-  isUnionDef: boolean
-}
-export type TypeName = { name: string } & Getters
+import { PluginManager } from 'live-plugin-manager'
+import { Config, PluginDef } from './config.js'
 
-/** Avro primitive types */
-export type PrimitiveDef =
-  | ({ type: 'string' } & Getters)
-  | ({ type: 'int' } & Getters)
-  | ({ type: 'long' } & Getters)
-  | ({ type: 'float' } & Getters)
-  | ({ type: 'double' } & Getters)
-  | ({ type: 'boolean' } & Getters)
-  | ({ type: 'bytes' } & Getters)
-  | ({ type: 'null' } & Getters)
-  | ({ type: 'decimal' } & Getters)
-  | ({ type: 'date' } & Getters)
-  | ({ type: 'time-millis' } & Getters)
-  | ({ type: 'timestamp_millis' } & Getters)
+const manager = new PluginManager()
 
-/** Avro Map Type */
-export type MapDef = {
-  values: FieldType
-} & Getters
-
-/** Avro Array Type */
-export type ArrayDef = {
-  items: FieldType
-} & Getters
-
-/* represents an Avro Union type `union {etc, etc}` */
-export type UnionDef = {
-  types: (TypeName | PrimitiveDef | ArrayDef | MapDef | UnionDef)[]
-} & Getters
-
-export type EnumDef = { name: string; symbols: string[]; doc?: string } & {
-  __brand: 'EnumDef'
-}
-
-/** represents an Avro Record field possible type */
-export type FieldType = TypeName | MapDef | UnionDef | ArrayDef | PrimitiveDef
-
-/** represents a field in an Avro Record definition */
-export type FieldDef = {
+export type PluginCfg = {
+  src: 'npm' | 'github' | 'local'
+  version?: string
+  repo?: string
+  path?: string
   name: string
-  type: FieldType
-  doc?: string
-} & { __brand: 'FieldDef' }
-
-/** represents an Avro Record Definition */
-export type RecordDef = {
-  name: string
-  doc?: string
-  fields: FieldDef[]
 }
 
-/** represents an Avro Error Definition */
-export type ErrorDef = {
-  name: string
-  doc?: string
-  fields: FieldDef[]
+const exists = (data: unknown): boolean => data !== undefined && data !== null
+
+const src = (plugin: PluginDef): 'npm' | 'github' | 'local' => {
+  if (!exists(plugin.repo) && !exists(plugin.path)) {
+    return 'npm'
+  }
+  if (plugin.repo) {
+    return 'github'
+  }
+  return plugin.path ? 'local' : 'npm'
+}
+const fromCfg = (cfg: Config): PluginCfg[] => {
+  return cfg.map(plugin => {
+    return {
+      name: plugin.name,
+      version: plugin.version,
+      repo: plugin.repo,
+      path: plugin.path,
+      src: src(plugin)
+    }
+  })
 }
 
-/** represents an Avro Message Param Definition */
-export type ParamDef = {
-  name: string
-  type: FieldType
+const install = (plugin: PluginCfg) => {
+  switch (plugin.src) {
+    case 'npm': {
+      return manager.install(plugin.name, plugin.version)
+    }
+    case 'github': {
+      return manager.installFromGithub(plugin.repo ?? '')
+    }
+    case 'local': {
+      return manager.installFromPath(plugin.path ?? '')
+    }
+  }
 }
-
-/** Http Verbs that are accepted in doc comments to produce the proper
- * code output for clients and servers */
-export type RequestType = 'GET' | 'POST' | 'PUT' | 'DELETE'
-
-export type Void = { type: 'void' }
-
-/** represents an Avro Method Return Type Definition */
-export type ReturnTypeDef = FieldType | Void
-/** represents an Avro Method Definition */
-export type MethodDef = {
-  name: string
-  doc?: string
-  httpRequestType: RequestType
-  returnType: ReturnTypeDef
-  params: ParamDef[]
+export const installPlugins = async (cfg: Config) => {
+  try {
+    await Promise.all(fromCfg(cfg).map(cf => install(cf)))
+  } catch (error) {
+    console.error(error)
+  }
 }
-
-/** Represents an Avro Protocol Definition */
-export type ProtoDef = {
-  doc?: string
-  name: string
-  records: RecordDef[]
-  enums: EnumDef[]
-  errors: ErrorDef[]
-  methods: MethodDef[]
-}
-
-/** Represents a generated code file returned from a ProtoDef plugin */
-export type GeneratedCode = { fileName: string; contents: string }
-
-/** Represents a ProtoDef plugin */
-export type ProtoDefPlugin = (protos: ProtoDef[]) => GeneratedCode[]

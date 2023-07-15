@@ -26,5 +26,6 @@
         "test"
     ],
     "docwriter.style": "JSDoc",
-    "docwriter.progress.trackTypes": false
+    "docwriter.progress.trackTypes": false,
+    "typescript.tsdk": "node_modules/typescript/lib"
 }
