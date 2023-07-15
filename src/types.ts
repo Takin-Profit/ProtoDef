@@ -17,8 +17,8 @@ export type PrimitiveDef =
   | { type: 'null'; __brand: 'PrimitiveDef' }
   | { type: 'decimal'; __brand: 'PrimitiveDef' }
   | { type: 'date'; __brand: 'PrimitiveDef' }
-  | { type: 'time-ms'; __brand: 'PrimitiveDef' }
-  | { type: 'timestamp-millis'; __brand: 'PrimitiveDef' }
+  | { type: 'time-millis'; __brand: 'PrimitiveDef' }
+  | { type: 'timestamp_millis'; __brand: 'PrimitiveDef' }
 
 /** Avro Map Type */
 export type MapDef = {

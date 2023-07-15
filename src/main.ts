@@ -23,6 +23,7 @@ const makePath = (file: string) =>
 */
 
 asvc.assembleProtocol(makePath('pt.avdl'), (err, schema) => {
+  // console.log(schema['types'][2]['fields'])
   console.log(build(schema))
   console.error(err)
 })

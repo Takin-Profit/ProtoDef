@@ -13,7 +13,8 @@
         "SMMA",
         "sonarjs",
         "Swma",
-        "TEMA"
+        "TEMA",
+        "vals"
     ],
     "conventionalCommits.scopes": [
         "api",

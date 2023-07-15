@@ -20,7 +20,7 @@ import {
   TypeName,
   UnionDef
 } from './types.js'
-import { getDoc } from './util.js'
+import { RawType, getDoc, getType, hasProp } from './util.js'
 
 const parseRequestType = (doc: string): RequestType => {
   const match = new RegExp(/\|\s*(get|post|put|delete)\s*\|/i).exec(doc)
@@ -46,50 +46,81 @@ export const make = {
     return { type: type as string, __brand: 'PrimitiveDef' } as PrimitiveDef
   },
   union(typesList: unknown[]): UnionDef {
-    return { types: typesList.map(t => this.fieldType(t)), __brand: 'UnionDef' }
+    return {
+      types: typesList.map(t => this.fieldType(t as RawType)),
+      __brand: 'UnionDef'
+    }
   },
   typeName(name: unknown): TypeName {
     return { name: name as string, __brand: 'TypeName' }
   },
 
-  map(values: unknown): MapDef {
-    return { values: this.fieldType(values), __brand: 'MapDef' }
+  map(type: unknown): MapDef {
+    const t = getType(type) as Record<string, unknown>
+    const values = t['values']
+    const toBuild =
+      typeof values === 'object' && values !== null && 'type' in values
+        ? values
+        : { type: values }
+    return {
+      values: this.fieldType(toBuild),
+      __brand: 'MapDef'
+    }
   },
   array(items: unknown): ArrayDef {
-    return { items: this.fieldType(items), __brand: 'ArrayDef' }
+    const it = getType(items) as Record<string, unknown>
+    const data = it['items']
+    const toBuild =
+      typeof data === 'object' && data !== null && 'type' in data
+        ? data
+        : { type: data }
+    return { items: this.fieldType(toBuild), __brand: 'ArrayDef' }
   },
-  fieldType(type: unknown): FieldType {
+
+  logicalPrim(type: Record<string, unknown>): PrimitiveDef {
+    return {
+      type: type['logicalType'] as string,
+      __brand: 'PrimitiveDef'
+    } as PrimitiveDef
+  },
+
+  fieldType(type: RawType): FieldType {
     if (type === undefined || type === null) {
       throw new Error('type is undefined')
     }
-    switch (type) {
-      case is.primitive(type): {
+    if (typeof type === 'string') {
+      if (is.primitive(type)) {
         return make.primitive(type)
       }
-      case is.union(type): {
-        return make.union(type as unknown[])
-      }
-      case is.typeName(type): {
-        return make.typeName(type as unknown)
-      }
-      case is.map(type): {
-        return make.map(type)
-      }
-      case is.array(type): {
-        return make.array(type)
-      }
-      default: {
-        return make.primitive(type)
+      if (is.typeName(type)) {
+        return make.typeName(type)
       }
     }
+    if (typeof type === 'object') {
+      if (hasProp(type, 'logicalType')) {
+        return make.logicalPrim(type as Record<string, unknown>)
+      }
+      if (hasProp(type, 'values')) {
+        return make.map(type)
+      }
+      if (hasProp(type, 'items')) {
+        return make.array(type)
+      }
+    }
+
+    if (Array.isArray(type)) {
+      return make.union(type)
+    }
+    throw new Error(`invalid type => ${JSON.stringify(type)}`)
   },
+
   fieldDef(obj: Record<string, unknown>): FieldDef {
     validate(obj, `field name is undefined`)
 
     return {
       __brand: 'FieldDef',
       name: obj['name'] as string,
-      type: this.fieldType(obj),
+      type: this.fieldType(obj['type'] as RawType),
       doc: getDoc(obj)
     }
   },
@@ -171,7 +202,7 @@ export const make = {
     if (typeof obj === 'string' && obj === 'null') {
       return { __brand: 'Void', type: 'void' }
     }
-    return this.fieldType(obj)
+    return this.fieldType(obj as RawType)
   },
 
   method(def: { name: string; obj: Record<string, unknown> }): MethodDef {

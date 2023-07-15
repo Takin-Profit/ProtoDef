@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 import test from 'japa'
-import { camelToSnake } from '../src/index.js'
+import { camelToSnake } from '../src/util.js'
 
 test.group('Test camelToSnake', () => {
   test('should convert camelCase to snake_case', assert => {

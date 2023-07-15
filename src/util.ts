@@ -2,6 +2,28 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// possible types for a field from avro schema
+
+export const hasProp = (obj: unknown, prop: string) =>
+  Object.prototype.hasOwnProperty.call(obj, prop)
+export type RawType = string | Record<string, unknown> | Array<unknown>
+export const isObj = (obj: unknown): obj is Record<string, unknown> =>
+  typeof obj === 'object' && obj !== null
+
+// Cast unknown to a type that can be worked with
+export type Field = Record<string, unknown> & { type: unknown }
+
+// convert from unknown to Field
+export const getField = (s: unknown): Field => {
+  if (typeof s !== 'object' || s === null || !('type' in s)) {
+    throw new Error(`invalid field => ${JSON.stringify(s)}`)
+  }
+  return s as Field
+}
+
+export const getType = (s: unknown): unknown => {
+  return getField(s)['type']
+}
 export type Lang = 'ts' | 'py'
 // grab the protocol doc comment
 export const getDoc = (obj: Record<string, unknown>): string | undefined => {

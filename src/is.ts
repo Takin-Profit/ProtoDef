@@ -2,24 +2,24 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Cast unknown to a type that can be worked with
-type Field = Record<string, unknown> & { type: unknown }
-
-// convert from unknown to Field
-const getField = (s: unknown): Field => {
-  if (typeof s !== 'object' || s === null || !('type' in s)) {
-    throw new Error('invalid field')
-  }
-  return s as Field
-}
-
-const getType = (s: unknown): unknown => {
-  return getField(s)['type']
-}
+import { getType, isObj } from './util.js'
 
 export const is = {
-  primitive(s: unknown): boolean {
-    const type = getType(s)
+  logicalType(type: unknown): boolean {
+    return (
+      isObj(type) &&
+      'logicalType' in type &&
+      [
+        'decimal',
+        'date',
+        'time-ms',
+        'timestamp-millis',
+        'time-millis',
+        'timestamp-ms'
+      ].includes(type['logicalType'] as string)
+    )
+  },
+  primitive(type: unknown): boolean {
     return (
       typeof type === 'string' &&
       [
@@ -32,34 +32,43 @@ export const is = {
         'bytes',
         'null',
         'decimal',
-        'date',
-        'time-ms',
-        'timestamp-millis'
+        'date'
       ].includes(type)
     )
   },
-  container(s: unknown): boolean {
-    const type = getType(s)
+  container(type: unknown): boolean {
     return Array.isArray(type) || typeof type === 'object'
   },
   union(s: unknown): boolean {
     return Array.isArray(getType(s))
   },
-  typeName(s: unknown): boolean {
-    const type = getType(s)
+  typeName(type: unknown): boolean {
     return (
-      type !== undefined && typeof type === 'string' && !this.primitive(type)
+      type !== undefined &&
+      typeof type === 'string' &&
+      ![
+        'string',
+        'int',
+        'long',
+        'float',
+        'double',
+        'boolean',
+        'bytes',
+        'null',
+        'decimal',
+        'date',
+        'map',
+        'array'
+      ].includes(type)
     )
   },
-  map(s: unknown): boolean {
-    const type = getType(s)
+  map(type: unknown): boolean {
     return (
       this.container(type) && !Array.isArray(type) && getType(type) === 'map'
     )
   },
 
-  array(s: unknown): boolean {
-    const type = getType(s)
+  array(type: unknown): boolean {
     return (
       this.container(type) && !Array.isArray(type) && getType(type) === 'array'
     )
