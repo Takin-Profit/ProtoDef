@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-import { getType, isObj } from './util.js'
+import { isObj } from './util.js'
 
 export const is = {
   logicalType(type: unknown): boolean {
@@ -39,9 +39,6 @@ export const is = {
   container(type: unknown): boolean {
     return Array.isArray(type) || typeof type === 'object'
   },
-  union(s: unknown): boolean {
-    return Array.isArray(getType(s))
-  },
   typeName(type: unknown): boolean {
     return (
       type !== undefined &&
@@ -60,17 +57,6 @@ export const is = {
         'map',
         'array'
       ].includes(type)
-    )
-  },
-  map(type: unknown): boolean {
-    return (
-      this.container(type) && !Array.isArray(type) && getType(type) === 'map'
-    )
-  },
-
-  array(type: unknown): boolean {
-    return (
-      this.container(type) && !Array.isArray(type) && getType(type) === 'array'
     )
   }
 }

@@ -20,7 +20,7 @@ import {
   TypeName,
   UnionDef
 } from './types.js'
-import { RawType, getDoc, getType, hasProp } from './util.js'
+import { RawType, getDoc, hasProp } from './util.js'
 
 const parseRequestType = (doc: string): RequestType => {
   const match = new RegExp(/\|\s*(get|post|put|delete)\s*\|/i).exec(doc)
@@ -31,6 +31,7 @@ const parseRequestType = (doc: string): RequestType => {
   return 'GET'
 }
 
+// simple validation for objects that should have a name
 const validate = (obj: Record<string, unknown>, errMsg: string) => {
   if (
     !('name' in obj) ||
@@ -42,75 +43,74 @@ const validate = (obj: Record<string, unknown>, errMsg: string) => {
   }
 }
 export const make = {
-  primitive(type: unknown): PrimitiveDef {
-    return { type: type as string, __brand: 'PrimitiveDef' } as PrimitiveDef
+  primitive(type: string): PrimitiveDef {
+    return { type, __brand: 'PrimitiveDef' } as PrimitiveDef
   },
-  union(typesList: unknown[]): UnionDef {
+  union(typesList: RawType[]): UnionDef {
     return {
-      types: typesList.map(t => this.fieldType(t as RawType)),
+      types: typesList.map(t => this.fieldType(t)),
       __brand: 'UnionDef'
     }
   },
-  typeName(name: unknown): TypeName {
-    return { name: name as string, __brand: 'TypeName' }
+  typeName(name: string): TypeName {
+    return { name, __brand: 'TypeName' }
   },
 
-  map(type: unknown): MapDef {
-    const t = getType(type) as Record<string, unknown>
-    const values = t['values']
-    const toBuild =
-      typeof values === 'object' && values !== null && 'type' in values
-        ? values
-        : { type: values }
+  map(type: Record<string, unknown>): MapDef {
     return {
-      values: this.fieldType(toBuild),
+      values: this.fieldType(type['values'] as RawType),
       __brand: 'MapDef'
     }
   },
-  array(items: unknown): ArrayDef {
-    const it = getType(items) as Record<string, unknown>
-    const data = it['items']
-    const toBuild =
-      typeof data === 'object' && data !== null && 'type' in data
-        ? data
-        : { type: data }
-    return { items: this.fieldType(toBuild), __brand: 'ArrayDef' }
+  array(it: Record<string, unknown>): ArrayDef {
+    return {
+      items: this.fieldType(it['items'] as RawType),
+      __brand: 'ArrayDef'
+    }
   },
 
   logicalPrim(type: Record<string, unknown>): PrimitiveDef {
+    if (!is.logicalType(type)) {
+      throw new Error(`invalid logical type => ${JSON.stringify(type)}`)
+    }
     return {
       type: type['logicalType'] as string,
       __brand: 'PrimitiveDef'
     } as PrimitiveDef
   },
 
+  _handleString(type: string) {
+    return is.primitive(type) ? make.primitive(type) : make.typeName(type)
+  },
+
+  _handleObj(type: Record<string, unknown>) {
+    if (hasProp(type, 'items')) {
+      return make.array(type)
+    }
+    if (hasProp(type, 'values')) {
+      return make.map(type)
+    }
+    if (hasProp(type, 'logicalType')) {
+      return make.logicalPrim(type)
+    }
+    throw new Error(`invalid type => ${JSON.stringify(type)}`)
+  },
   fieldType(type: RawType): FieldType {
     if (type === undefined || type === null) {
       throw new Error('type is undefined')
     }
-    if (typeof type === 'string') {
-      if (is.primitive(type)) {
-        return make.primitive(type)
-      }
-      if (is.typeName(type)) {
-        return make.typeName(type)
-      }
-    }
-    if (typeof type === 'object') {
-      if (hasProp(type, 'logicalType')) {
-        return make.logicalPrim(type as Record<string, unknown>)
-      }
-      if (hasProp(type, 'values')) {
-        return make.map(type)
-      }
-      if (hasProp(type, 'items')) {
-        return make.array(type)
-      }
+    if (typeof type === 'string' && !['map', 'array'].includes(type)) {
+      return this._handleString(type)
     }
 
     if (Array.isArray(type)) {
-      return make.union(type)
+      return make.union(type as RawType[])
     }
+
+    if (typeof type === 'object') {
+      return this._handleObj(type)
+    }
+
     throw new Error(`invalid type => ${JSON.stringify(type)}`)
   },
 

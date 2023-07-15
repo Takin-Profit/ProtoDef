@@ -2,5 +2,6 @@ protocol Fame {
   record Job {
   array<array<map<array<string>>>> inputFiles;
   union { string, array<string>, map<array<string>>, union {string, int} } outputFiles;
+  array<time_ms> times;
 }
 }
