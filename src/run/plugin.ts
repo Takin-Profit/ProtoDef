@@ -1,9 +1,9 @@
 import consola from 'consola'
 import { PluginManager } from 'live-plugin-manager'
+import { ProtoDefPlugin } from '../types.js'
 import { Config, PluginDef } from './config.js'
-import { ProtoDefPlugin } from './types.js'
 
-export type PluginCfg = {
+type PluginCfg = {
   src: 'npm' | 'github' | 'local'
   version?: string
   repo?: string

@@ -43,6 +43,8 @@ const validate = (obj: Record<string, unknown>, errMsg: string) => {
     throw new Error(errMsg)
   }
 }
+
+/// Utility functions for building the ProtoDef object types
 export const make = {
   logicalPrim(type: Record<string, unknown>): PrimitiveDef {
     if (!is.logicalType(type)) {

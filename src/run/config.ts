@@ -5,7 +5,7 @@ import consola from 'consola'
 import { access, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import toml from 'toml'
-import { hasProp } from './build/util.js'
+import { hasProp } from '../build/util.js'
 
 /** The schema for a plugin loaded from either a toml config or cli options */
 export type PluginDef = {
@@ -85,6 +85,7 @@ const parseConfig = (config: Record<string, unknown>): Config => {
     throw error
   }
 }
+/** Get the config from a toml file */
 export const getConfig = async (config: string): Promise<Config> => {
   const hasCfg = await hasConfigFile(config)
   if (!hasCfg) {

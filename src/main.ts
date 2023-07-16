@@ -3,18 +3,17 @@
 // license that can be found in the LICENSE file.
 
 import { command, option, optional, positional, run, string } from 'cmd-ts'
-import { getConfig } from './config.js'
-
+import { run as runner } from './run/run.js'
 const app = command({
   name: 'protodef',
   version: '0.1.0',
   args: {
-    protos: positional({
+    protosDir: positional({
       type: string,
-      displayName: 'protos',
+      displayName: 'protos-dir',
       description: 'Path to directory containing .avdl proto files'
     }),
-    config: option({
+    configFile: option({
       type: optional(string),
       long: 'config',
       short: 'c',
@@ -23,9 +22,9 @@ const app = command({
       defaultValue: () => `${process.cwd()}.protodef.toml`
     })
   },
-  handler: async ({ protos, config }) => {
+  handler: async ({ protosDir, configFile }) => {
     // cmd-ts should handle the default value for config, but it doesn't
-    const conf = await getConfig(config ?? `${process.cwd()}.protodef.toml`)
+    await runner(protosDir, configFile ?? `${process.cwd()}.protodef.toml`)
   }
 })
 
