@@ -32,10 +32,10 @@
   },
   "dependencies": {
     "avsc": "^5.7.7",
-    "commander": "^11.0.0",
+    "cmd-ts": "^0.12.1",
     "consola": "^3.2.3",
-    "fs-extra": "^11.1.1",
     "live-plugin-manager": "^0.18.1",
+    "ora": "^6.3.1",
     "readdirp": "^3.6.0",
     "toml": "^3.0.0"
   },

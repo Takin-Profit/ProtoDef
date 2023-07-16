@@ -1,10 +1,10 @@
-[protodef.plugin_example]
+[protodef.ts_solidjs]
 post = 'echo "Hello World"'
 version = '0.0.1'
 out = 'python_plugin_example'
 
 
-[protodef.python_plugin_litestar]
+[protodef.python_litestar]
 post = 'echo "Hello World"'
 version = '0.0.1'
 out = 'python_plugin_example'

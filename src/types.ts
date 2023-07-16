@@ -254,3 +254,9 @@ export type ProtoDef = {
   errors?: ErrorDef[]
   methods?: MethodDef[]
 } & { __brand: 'ProtoDef' }
+
+/** Represents a generated code file returned from a ProtoDef plugin */
+export type GeneratedCode = { fileName: string; contents: string }
+
+/** Represents a ProtoDef plugin */
+export type ProtoDefPlugin = (protos: ProtoDef) => GeneratedCode

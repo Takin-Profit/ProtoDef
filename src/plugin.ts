@@ -1,7 +1,7 @@
+import consola from 'consola'
 import { PluginManager } from 'live-plugin-manager'
 import { Config, PluginDef } from './config.js'
-
-const manager = new PluginManager()
+import { ProtoDefPlugin } from './types.js'
 
 export type PluginCfg = {
   src: 'npm' | 'github' | 'local'
@@ -10,6 +10,8 @@ export type PluginCfg = {
   path?: string
   name: string
 }
+
+const manager = new PluginManager()
 
 const exists = (data: unknown): boolean => data !== undefined && data !== null
 
@@ -22,7 +24,8 @@ const src = (plugin: PluginDef): 'npm' | 'github' | 'local' => {
   }
   return plugin.path ? 'local' : 'npm'
 }
-const fromCfg = (cfg: Config): PluginCfg[] => {
+
+const pluginsFromConfig = (cfg: Config): PluginCfg[] => {
   return cfg.map(plugin => {
     return {
       name: plugin.name,
@@ -47,10 +50,38 @@ const install = (plugin: PluginCfg) => {
     }
   }
 }
-export const installPlugins = async (cfg: Config) => {
+const installPlugins = async (plugins: PluginCfg[]) => {
   try {
-    await Promise.all(fromCfg(cfg).map(cf => install(cf)))
+    await Promise.all(plugins.map(plugin => install(plugin)))
   } catch (error) {
-    console.error(error)
+    const e = error as Error
+    consola.error(`Plugin installation failed: ${e.message}`)
+    throw e
+  }
+}
+
+const requirePlugin = (plugin: PluginCfg): ProtoDefPlugin => {
+  switch (plugin.src) {
+    case 'npm': {
+      return manager.require(plugin.name) as ProtoDefPlugin
+    }
+    case 'github': {
+      return manager.require(plugin.repo ?? '') as ProtoDefPlugin
+    }
+    case 'local': {
+      return manager.require(plugin.path ?? '') as ProtoDefPlugin
+    }
+  }
+}
+
+export const fetchPlugins = async (cfg: Config): Promise<ProtoDefPlugin[]> => {
+  const plugins = pluginsFromConfig(cfg)
+  await installPlugins(plugins)
+  try {
+    return plugins.map(plugin => requirePlugin(plugin))
+  } catch (error) {
+    const e = error as Error
+    consola.error(`Plugin loading failed: ${e.message}`)
+    throw e
   }
 }

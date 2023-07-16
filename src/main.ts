@@ -2,40 +2,35 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-import { program } from '@commander-js/extra-typings'
-import { consola } from 'consola'
+import { command, option, optional, positional, run, string } from 'cmd-ts'
 import { getConfig } from './config.js'
-import { run } from './run.js'
+
+const app = command({
+  name: 'protodef',
+  version: '0.1.0',
+  args: {
+    protos: positional({
+      type: string,
+      displayName: 'protos',
+      description: 'Path to directory containing .avdl proto files'
+    }),
+    config: option({
+      type: optional(string),
+      long: 'config',
+      short: 'c',
+      env: 'PROTODEF_CONFIG',
+      description: 'Path to config file if it is not in the default location',
+      defaultValue: () => `${process.cwd()}.protodef.toml`
+    })
+  },
+  handler: async ({ protos, config }) => {
+    // cmd-ts should handle the default value for config, but it doesn't
+    const conf = await getConfig(config ?? `${process.cwd()}.protodef.toml`)
+  }
+})
 
 const main = async () => {
-  program
-    .name('protodef')
-    .version('0.0.1')
-    .description(
-      'Protodef CLI tool for generating code from Avro idl protocol definitions.'
-    )
-    .argument(
-      '<schema-dir>',
-      'path to a directory containing idl files to generate code from'
-    )
-    .option('-o, --out <out>', 'output directory', process.cwd())
-    .option('-p, --plugin <plugin>', 'install plugin from npm')
-    .option('--post <post>', 'post generation command')
-    .option('-c, --config <config>', 'path to a config file (if not in cwd)')
-    .option('-r, --repo <repo>', 'install plugin from git repo')
-    .option('--path', 'install local plugin from path')
-    .option('--version', 'install plugin version from npm')
-    .allowExcessArguments(false)
-    .allowUnknownOption(false)
-    .action(async (dir, options) => {
-      const cfg = await getConfig()
-      consola.info(cfg)
-      consola.info(dir)
-      consola.info('options =', options)
-      run(dir)
-    })
-
-  await program.parseAsync(process.argv)
+  await run(app, process.argv.slice(2))
 }
 
 await main()

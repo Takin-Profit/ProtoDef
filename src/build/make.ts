@@ -3,7 +3,6 @@
 // license that can be found in the LICENSE file.
 
 import { consola } from 'consola'
-import { is } from './is.js'
 import {
   EnumDef,
   ErrorDef,
@@ -20,7 +19,8 @@ import {
   primitiveDef,
   typeName,
   unionDef
-} from './types.js'
+} from '../types.js'
+import { is } from './is.js'
 import { RawType, fixDoc, getDoc, hasProp } from './util.js'
 
 const parseRequestType = (doc: string): RequestType => {
