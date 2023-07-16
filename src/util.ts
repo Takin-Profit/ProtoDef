@@ -39,6 +39,15 @@ export const getDoc = (obj: Record<string, unknown>): string | undefined => {
   return obj['doc'] as string
 }
 
+export const getNamespace = (
+  obj: Record<string, unknown>
+): string | undefined => {
+  if (obj['namespace'] === undefined || obj['namespace'] === null) {
+    return
+  }
+  return obj['namespace'] as string
+}
+
 const protocol = 'protocol'
 // grab the protocol name
 export const getProtoName = (schema: Record<string, unknown>): string =>
@@ -66,12 +75,14 @@ export const getErrors = (
 
 export const getMethods = (
   schema: Record<string, unknown>
-): { name: string; obj: Record<string, unknown> }[] => {
+): { name: string; obj: Record<string, unknown> }[] | undefined => {
   const methods =
     'messages' in schema
       ? (schema['messages'] as Record<string, unknown>)
-      : { messages: {} }
-
+      : undefined
+  if (methods === undefined) {
+    return undefined
+  }
   const defs: { name: string; obj: Record<string, unknown> }[] = []
   for (const name in methods) {
     if (Object.hasOwn(methods, name)) {

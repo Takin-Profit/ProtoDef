@@ -6,6 +6,7 @@ import idl "foo.avdl";
 /**
  * An example protocol in Avro IDL
  */
+@namespace("org.apache.avro.idl.test")
 protocol Simple {
   /** Documentation for the enum type Kind */
   enum Kind {

@@ -1,11 +1,11 @@
-/* eslint-disable tsdoc/syntax */
-/* eslint-disable no-console */
 // Copyright 2023 Takin Profit. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 import { program } from '@commander-js/extra-typings'
+import { consola } from 'consola'
 import { getConfig } from './config.js'
+import { run } from './run.js'
 
 const main = async () => {
   program
@@ -29,34 +29,13 @@ const main = async () => {
     .allowUnknownOption(false)
     .action(async (dir, options) => {
       const cfg = await getConfig()
-      console.log(cfg)
-      console.log(dir)
-      console.log('options =', options)
+      consola.info(cfg)
+      consola.info(dir)
+      consola.info('options =', options)
+      run(dir)
     })
 
   await program.parseAsync(process.argv)
 }
 
 await main()
-/**
-  const makePath = (file: string) =>
-    path.join(
-      path.dirname(url.fileURLToPath(import.meta.url).replace('/src', '')),
-      'api',
-      file
-    )
-
-*/
-/**
-  const getProtocol = (file: string) => {
-    return readFileSync(makePath(file), 'utf8')
-  }
-*/
-
-/**
-  asvc.assembleProtocol(makePath('pt.avdl'), (err, schema) => {
-    console.log(schema['types'][1]['fields'])
-    console.log(JSON.stringify(build(schema)))
-    console.error(err)
-  })
-*/

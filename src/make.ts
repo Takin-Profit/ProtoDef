@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+import { consola } from 'consola'
 import { is } from './is.js'
 import {
   EnumDef,
@@ -188,7 +189,9 @@ export const make = {
       obj['request'] === null ||
       !Array.isArray(obj['request'])
     ) {
-      throw new Error(`invalid method definition`)
+      const msg = `invalid method definition ${JSON.stringify(def)}`
+      consola.error(msg)
+      throw new Error(msg)
     }
     const doc = getDoc(obj)
     return {

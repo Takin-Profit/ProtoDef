@@ -234,12 +234,23 @@ export type MethodDef = {
   params: ParamDef[]
 } & { __brand: 'MethodDef' }
 
+/** represents file path information for a ProtoDef */
+export type PathInfo = {
+  /** name of the file */
+  fileName: string
+  /** directory containing the file */
+  dirName?: string
+  /** full path to the file */
+  fullPath: string
+}
 /** Represents an Avro Protocol Definition */
 export type ProtoDef = {
+  pathInfo: PathInfo
+  namespace?: string
   doc?: string
   name: string
-  records: RecordDef[]
-  enums: EnumDef[]
-  errors: ErrorDef[]
-  methods: MethodDef[]
+  records?: RecordDef[]
+  enums?: EnumDef[]
+  errors?: ErrorDef[]
+  methods?: MethodDef[]
 } & { __brand: 'ProtoDef' }

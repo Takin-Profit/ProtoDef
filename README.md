@@ -1,13 +1,13 @@
-# EasyRpc
+# ProtoDef
 
 (intetionally)  unsupported avro idl language syntax.
 
-* @namespace
+* @namespace, ( only a single top level namespace is allowed for each protocol )
 * @aliase
 * fixed length fields
 * @java-class
 * @order
-* null union shorthand, E.G.  `string?`
+* null union shorthand, E.G.  `string?` use `{ string, null }` instead
 * throws,  use `union { SomeType, SomeError } ` instead
 * oneway
 * @logicalType
