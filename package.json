@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "avsc": "^5.7.7",
-    "cmd-ts": "^0.12.1",
+    "cmd-ts": "^0.13.0",
     "consola": "^3.2.3",
     "live-plugin-manager": "^0.18.1",
     "ora": "^6.3.1",
